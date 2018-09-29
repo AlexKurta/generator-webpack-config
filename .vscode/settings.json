@@ -2,5 +2,13 @@
     "files.exclude": {
         "app": true,
         "node_modules": true
-    }
+    },
+    "spellright.language": [
+        "en"
+    ],
+    "spellright.documentTypes": [
+        "markdown",
+        "latex",
+        "plaintext"
+    ]
 }

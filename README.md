@@ -1,54 +1,59 @@
 # generator-webpack-config
 
-## What is it?
-
 [Yeoman](http://yeoman.io/) generator generating a webpack configuration file
 
-## Getting started
+## Why?
 
-- Install: `npm install -g generator-webpack-config`
-- Run: `yo webpack-config`
+Manually creating webpack configuration files ...
 
-## But can't I just create my webpack configuration file(s) manually?
+* is time consuming
+* is error prone (no automated tests)
+* requires knowledge of webpack
+* has all the disadvantages of copy/paste in case of multiple configuration files
 
-Yes, I did so too before a created this project, but:
+## Caveats
 
-* you need the know-how and ..keep the know-how. And update your know-how with each webpack version and new webpack plugins or plugin versions
-* time consuming
-* you need have lots of project using webpack, so lots of copy and paste
-* you want to optimize the config of your project => have to change each config. with this generator you just run it again and it updates the configuration to the newest version
-* error prone, no automated tests (like with this project)
+* limited configuration ability compared to webpack (may also want to use [webpack-merge](https://www.npmjs.com/package/webpack-merge) to merge with additional webpack configuration)
 
-Personally, I was fed up with creating a new webconfig configuration for each of my projects or copy/pasting the hell out of my previous webpack configs, because, let's face it, every one knows why duplicating code is bad.
+## Getting Started
 
-## Cons
+Install [Yeoman](http://yeoman.io/)
 
-* generates only limited configs for limited use cases
-* if you want more you have to [merge](https://www.npmjs.com/package/webpack-merge) with your own config or modify the generated webpack config. or you'll have to contribute to this project :)
-* you can also modify the generated config, but then you can't really let the generator update/overwrite your old configuration
+```
+npm install -g yo
+```
+
+Install the Yeoman generator
+
+```
+npm install -g generator-webpack-config
+```
+
+Run the Yeoman generator
+
+```
+yo webpack-config
+```
+
+The generator will create a webpack configuration file, prompting the user in case one already exists. It will add the necessary modules for webpack to the package.json file before doing `npm install`.
 
 ## Contributing
 
-I welcome any and all help and tips, because I want this to be the best it can be :)
-
-Prerequisite:
+After cloning this repository, run
 
 ```
-npm i
+npm install
 ```
 
-Generally there are some guidelines I want this project to honor:
+### Guidelines
 
-* features
-    * this project should not try to offer all that webpack can. It should provide sensible configuration options that cover common and/or sensible use cases.
-    * if you want the project to accommodate non-common use cases then try to abstract from that to provide a more general configuration ability.. without over complicating things => try to keep it logical and simple and non-error prone. Another possibility is adding some kind of plugin capability to the generator, so its code is not affected.
-    * provide sensible defaults for user inquiries
+* This project should not try to offer all that webpack can. It should provide sensible configuration options that cover common and/or sensible use cases.
+* If you want the project to accommodate non-common use cases then try to abstract from that to provide a more general configuration ability.. without over complicating things => try to keep it logical and simple and non-error prone. Another possibility is adding some kind of plugin capability to the generator, so its code is not affected.
+* Provide sensible defaults for user inquiries
+* Always write tests
+* Keep existing code style (indents, etc.)
 
-### Before sending pull request
-
-Please write tests for every feature added. Writing tests is easy :)
-
-Always run the tests to check no errors have been introduced:
+### Tests
 
 ```
 npm run test
@@ -56,35 +61,24 @@ npm run test
 
 It can take a bit of time before the tests show some results, but they will complete fairly fast.
 
-Please also check that the project runs as a locally installed npm module:
-
-First run this command to compile the project, run npm pack and npm install the tgz file into the os's temp directory (so it's isolated). In an attempt to avoid permission problems the script uses this approach and does not install anything globally.
+Please also check that the project runs as a locally installed npm module.
 
 ```
 npm run test-npm-local
 ```
 
-Then run it from the os's temp directory
+Then run the installed package.
 
 ```
 npm run test-npm-local-run
 ```
 
-The above commands are implemented in gulpfile.js, so you can review them there.
-
-### npm link
-
-The above method is more accurate than the 'npm link' method because npm linked packages have the complete project folder as directory context, because it's just a symlink, so errors that may occur with the actual packed package (which npm publish also uses) may not occur when using the 'npm link' method.
-
-If you do (also) use the 'npm link' method be sure to also install yeoman globally. Also run this beforehand:
-
-```
-./node_modules/.bin/tsc --watch
-```
+The above method is more accurate than the 'npm link' method because npm linked packages have the complete project folder as directory context, because it's just a symbolic link, so errors that may occur with the actual packed package (which npm publish also uses) may not occur when using the 'npm link' method.
+In an attempt to avoid permission problems the above script installs into the os's temp directory and does not install anything globally.
 
 ## TODOs
 
-Concrete TODOs can be found in the code (search for 'todo'), this is just a general indication of what can or should be improved
+Concrete TODOs can be found as comments in the code, this is just a general indication of what can or should be improved
 
 * bugs
     * css modules currently does not seem to work with sass indention syntax (.sass files)
