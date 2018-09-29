@@ -7,13 +7,13 @@
 ## Getting started
 
 - Install: `npm install -g generator-webpack-config`
-- Run: `yo generator`
+- Run: `yo webpack-config`
 
 ## But can't I just create my webpack configuration file(s) manually?
 
 Yes, I did so too before a created this project, but:
 
-* you need the knowhow and ..keep the knowhow. And update your knowhow with each webpack version and new webpack plugins or plugin versions
+* you need the know-how and ..keep the know-how. And update your know-how with each webpack version and new webpack plugins or plugin versions
 * time consuming
 * you need have lots of project using webpack, so lots of copy and paste
 * you want to optimize the config of your project => have to change each config. with this generator you just run it again and it updates the configuration to the newest version
@@ -37,11 +37,11 @@ Prerequisite:
 npm i
 ```
 
-Generelly there are some guidelines I want this project to honor:
+Generally there are some guidelines I want this project to honor:
 
 * features
     * this project should not try to offer all that webpack can. It should provide sensible configuration options that cover common and/or sensible use cases.
-    * if you want the project to accomodate non-common use cases then try to abstract from that to provide a more general configuration ability.. without overcomplicating things => try to keep it logical and simple and non-error prone. Another possibility is adding some kind of plugin capability to the generator, to its code is not affected.
+    * if you want the project to accommodate non-common use cases then try to abstract from that to provide a more general configuration ability.. without over complicating things => try to keep it logical and simple and non-error prone. Another possibility is adding some kind of plugin capability to the generator, to its code is not affected.
     * provide sensible defaults for user inquiries
 
 ### Before sending pull request
@@ -58,13 +58,13 @@ It can take a bit of time before the tests show some results, but they will comp
 
 Please also check that the project runs as a locally installed npm module:
 
-First run this command to compile project, run npm pack and npm install the tgz file into os's temp dir (so it's isolated)
+First run this command to compile project, run npm pack and npm install the tgz file into os's temp directory (so it's isolated)
 
 ```
 npm run test-npm-local
 ```
 
-The run it from the os's temp dir
+Then run it from the os's temp directory
 
 ```
 npm run test-npm-local-run
@@ -89,8 +89,8 @@ Concrete TODOs can be found in the code (search for 'todo'), this is just a gene
 * bugs
     * css modules currently does not seem to work with sass indention syntax (.sass files)
 * generator
-    * the generator also does an npm install for the webpack deps after generating the config file. This npm install currently reports some "moderate vulnerabilities" that originate from the image-webpack-plugin
-    * some validation for generator inputs (although e.g. always checking for existance of a file beforehand can and should be debated)
+    * the generator also does an npm install for the webpack dependencies after generating the config file. This npm install currently reports some "moderate vulnerabilities" that originate from the image-webpack-plugin
+    * some validation for generator inputs (although e.g. always checking for existence of a file beforehand can and should be debated)
     * ability to extend the generator
     * populate resolve.alias object in webpack.config when using typescript (replicate paths from tsconfig.json)
 * tests
