@@ -41,7 +41,7 @@ Generally there are some guidelines I want this project to honor:
 
 * features
     * this project should not try to offer all that webpack can. It should provide sensible configuration options that cover common and/or sensible use cases.
-    * if you want the project to accommodate non-common use cases then try to abstract from that to provide a more general configuration ability.. without over complicating things => try to keep it logical and simple and non-error prone. Another possibility is adding some kind of plugin capability to the generator, to its code is not affected.
+    * if you want the project to accommodate non-common use cases then try to abstract from that to provide a more general configuration ability.. without over complicating things => try to keep it logical and simple and non-error prone. Another possibility is adding some kind of plugin capability to the generator, so its code is not affected.
     * provide sensible defaults for user inquiries
 
 ### Before sending pull request
@@ -58,7 +58,7 @@ It can take a bit of time before the tests show some results, but they will comp
 
 Please also check that the project runs as a locally installed npm module:
 
-First run this command to compile project, run npm pack and npm install the tgz file into os's temp directory (so it's isolated)
+First run this command to compile the project, run npm pack and npm install the tgz file into the os's temp directory (so it's isolated). In an attempt to avoid permission problems the script uses this approach and does not install anything globally.
 
 ```
 npm run test-npm-local
@@ -93,6 +93,8 @@ Concrete TODOs can be found in the code (search for 'todo'), this is just a gene
     * some validation for generator inputs (although e.g. always checking for existence of a file beforehand can and should be debated)
     * ability to extend the generator
     * populate resolve.alias object in webpack.config when using typescript (replicate paths from tsconfig.json)
+    * also try to remove no longer needed dependencies from package.json when generator configuration changes
+    * prettier code generation result
 * tests
     * don't run tests strictly once for production and once for development mode, but rather share more test code in this case to speed up test runs
     * some tests are still missing or incomplete

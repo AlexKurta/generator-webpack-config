@@ -11,9 +11,7 @@ function getDir(id) {
 }
 
 async function packToTmp(id) {
-    const whichCwd = which(process.cwd());
     console.log('Compiling and packing project');
-    await execa(whichCwd.sync('tsc'), { stdio: 'inherit' });
     await execa('npm', ['pack']);
     const pkgJson = JSON.parse((await fs.readFile('package.json')).toString());
     const pkgName = pkgJson.name;

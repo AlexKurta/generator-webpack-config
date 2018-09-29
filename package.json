@@ -9,7 +9,9 @@
   "scripts": {
     "test": "cross-env TS_NODE_PROJECT=test/tsconfig.json mocha -r ts-node/register test/**/test.ts",
     "test-npm-local": "gulp test-npm-local",
-    "test-npm-local-run": "gulp test-npm-local-run"
+    "test-npm-local-run": "gulp test-npm-local-run",
+    "prepublishOnly": "npm run test",
+    "prepare": "tsc"
   },
   "repository": "github:arogg/generator-webpack-config",
   "author": "Alexander Rogg",
