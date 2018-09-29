@@ -1,0 +1,63 @@
+{
+  "name": "generator-webpack-config",
+  "version": "0.1.0",
+  "description": "Yeoman generator generating a webpack configuration file",
+  "files": [
+    "app",
+    "webpack-template"
+  ],
+  "scripts": {
+    "test": "cross-env TS_NODE_PROJECT=test/tsconfig.json mocha -r ts-node/register test/**/test.ts",
+    "test-npm-local": "gulp test-npm-local",
+    "test-npm-local-run": "gulp test-npm-local-run"
+  },
+  "repository": "github:arogg/generator-webpack-config",
+  "author": "Alexander Rogg",
+  "license": "MIT",
+  "keywords": [
+    "yeoman-generator",
+    "yeoman",
+    "generator",
+    "init",
+    "create",
+    "boilerplate",
+    "webpack",
+    "configuration"
+  ],
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "dependencies": {
+    "detect-indent": "^5.0.0",
+    "fs-extra": "^7.0.0",
+    "ts-simple-ast": "^15.0.1",
+    "typescript": "^3.0.3",
+    "yeoman-generator": "^3.1.1"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.1.5",
+    "@types/detect-indent": "^5.0.0",
+    "@types/execa": "^0.9.0",
+    "@types/fs-extra": "^5.0.4",
+    "@types/lodash": "^4.14.116",
+    "@types/mocha": "^5.2.5",
+    "@types/phantom": "^3.2.5",
+    "@types/uuid": "^3.4.4",
+    "@types/yeoman-generator": "^2.0.3",
+    "@types/yeoman-test": "^1.7.4",
+    "chai": "^4.1.2",
+    "chai-fs": "^2.0.0",
+    "cross-env": "^5.2.0",
+    "execa": "^1.0.0",
+    "gulp": "^4.0.0",
+    "lodash": "^4.17.11",
+    "mocha": "^5.2.0",
+    "npm-which": "^3.0.1",
+    "phantom": "^6.0.3",
+    "rmfr": "^2.0.0",
+    "ts-node": "^7.0.1",
+    "uuid": "^3.3.2",
+    "webpack": "^4.19.1",
+    "yeoman-test": "^1.9.1"
+  }
+}
