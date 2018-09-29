@@ -1,6 +1,6 @@
 {
   "name": "generator-webpack-config",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Yeoman generator generating a webpack configuration file",
   "files": [
     "app",
