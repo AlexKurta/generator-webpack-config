@@ -67,7 +67,7 @@ describe('Generator', function () {
                 disableStore: true, // needed else yeoman could read from .yo-rc-global.json
                 ...customCmds
             };
-            await helpers.run(path.join(__dirname, '../src'))
+            await helpers.run(path.join(__dirname, '../app'))
                 .inDir(testdir, dir => {
                 })
                 .withPrompts(answers)

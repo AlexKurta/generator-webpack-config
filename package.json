@@ -7,11 +7,13 @@
     "webpack-template"
   ],
   "scripts": {
-    "test": "cross-env TS_NODE_PROJECT=test/tsconfig.json mocha -r ts-node/register test/**/test.ts",
+    "test": "npm run tsc && npm run testOnly",
+    "testOnly": "cross-env TS_NODE_PROJECT=test/tsconfig.json mocha -r ts-node/register test/**/test.ts",
     "test-npm-local": "gulp test-npm-local",
     "test-npm-local-run": "gulp test-npm-local-run",
-    "prepublishOnly": "npm run test",
-    "prepare": "tsc"
+    "tsc": "rimraf app && tsc",
+    "prepublishOnly": "npm run testOnly",
+    "prepare": "npm run tsc"
   },
   "repository": "github:arogg/generator-webpack-config",
   "author": "Alexander Rogg",
@@ -56,6 +58,7 @@
     "mocha": "^5.2.0",
     "npm-which": "^3.0.1",
     "phantom": "^6.0.3",
+    "rimraf": "^2.6.2",
     "rmfr": "^2.0.0",
     "ts-node": "^7.0.1",
     "uuid": "^3.3.2",
