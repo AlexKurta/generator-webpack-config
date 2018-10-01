@@ -1,5 +1,5 @@
 import { ternary, L, write } from "../../utils";
-import { AugmentModule } from "../../common/augmentModule";
+import { AugmentModule, Extension } from "../../common/augmentModule";
 import { Prompt } from "../../common/prompt";
 
 declare global {
@@ -11,17 +11,14 @@ declare global {
     }
 }
 
-export default class extends AugmentModule {
-
+export default class implements Extension {
     executeIf(resp: Config) {
         return resp.type === 'web';
     }
+
     prompts() {
         const prompts: Prompt<keyof Config>[] = [
             {
-                when: (resp: Config) => {
-                    return resp.type === 'web';
-                },
                 type: 'confirm',
                 name: 'html',
                 default: true,
@@ -59,6 +56,9 @@ export default class extends AugmentModule {
         ]
         return prompts;
     }
+    AugmentModule = class extends AugmentModule {
+
+    
 
     augment(): void {
         const { htmlTitle, htmlFilename, htmlTemplate } = this.config;
@@ -82,4 +82,5 @@ export default class extends AugmentModule {
             }, L(')'))
         )
     }
+}
 }

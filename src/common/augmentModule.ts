@@ -6,28 +6,45 @@ import { Context } from "vm";
 import { ParsedSource } from "./sourceFile";
 
 export abstract class AugmentModule {
+    protected readonly isDev = 'isDev';
+    private varStatementCounter = 0;
+
     constructor(protected readonly config: Config, protected readonly options: Options, protected readonly gen: Generator, private parsed: ParsedSource) {
     }
-    executeIf(config: Config): boolean { }
-    prompts(): Prompt<keyof Config>[] { };
+
     abstract augment(): void;
+
     protected addToConfigObject(addObj: { [key: string]: any }) {
         addToObject(this.parsed.config, addObj);
-    }// todo throw new Error() impl
+    }
+
     protected addRules(...elements: any[]) {
         addToArray(this.parsed.rules, ...elements);
     }
+
     protected addPlugins(...elements: any[]) {
         addToArray(this.parsed.plugins, ...elements);
     }
+
     protected addResolveExtensions(...elements: any[]) {
         addToArray(this.parsed.resolveExtensions, ...elements);
     }
+
     protected insertVariableStatement(variableStatement: VariableStatementStructure) {
-        throw new Error();
+        this.parsed.mainFunc.insertVariableStatement(this.varStatementCounter++, variableStatement);
     }
+
     protected addImportDeclaration(decl: ImportDeclarationStructure) {
         this.parsed.sourceFile.addImportDeclaration(decl);
     }
-    protected readonly isDev = 'isDev';
+}
+
+export interface AugmentModuleConstructor {
+    new(config: Config, options: Options, gen: Generator, parsed: ParsedSource): AugmentModule;
+}
+
+export interface Extension {
+    executeIf?(config: Partial<Config>): boolean;
+    prompts?(): Prompt<keyof Config>[];
+    AugmentModule: AugmentModuleConstructor;
 }

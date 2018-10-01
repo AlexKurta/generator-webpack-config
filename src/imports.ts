@@ -10,7 +10,7 @@ export function getReferencedModules(sourceFile: SourceFile) {
     }
 
     let m: RegExpMatchArray | null;
-    for (const re of [/"([\w-]+?-loader)"/g, /'([\w-]+?-loader)'/g]) {
+    for (const re of [/['"]([\w-]+?-loader)['"]/g, /require\(['"]([\w-]+?)['"]\)/g]) {
         do {
             m = re.exec(text);
             if (m) {
@@ -19,7 +19,7 @@ export function getReferencedModules(sourceFile: SourceFile) {
         } while (m);
     }
 
-    // todo also install modules that have require() and read peer deps from package.json
+    // todo read peer deps from package.json
     const npmdeps: { [key: string]: string[] } = {
         'babel-loader': ["@babel/core", "@babel/preset-env"],
         'sass-loader': ['node-sass'],

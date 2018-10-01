@@ -8,7 +8,11 @@ import * as detectIndent from 'detect-indent';
 import { getNestedPropertyValue } from './utils';
 import { getReferencedModules } from './imports';
 import { compile } from './compiler';
-import { AugmentModule } from './common/augmentModule';
+import { AugmentModule, Extension } from './common/augmentModule';
+import { parseFile } from './common/sourceFile';
+
+const WEBPACK_CONF_JS_NAME = 'webpack.config.js';
+const PACKAGEJSON_FILENAME = 'package.json';
 
 declare global {
     interface Options {
@@ -16,14 +20,35 @@ declare global {
     }
 }
 
-function getModules(): AugmentModule[] {
-    throw new Error();
+function getModules(dir: string): Extension[] {
+    const files = fs.readdirSync(dir).sort();
+    const result = [];
+    for (const file of files) {
+        const stat = fs.statSync(file);
+        const fullPath = path.join(dir, file);
+        if (stat.isFile()) {
+            const mod = require(fullPath) as Extension;
+            result.push(mod);
+        } else {
+            const subModules = getModules(fullPath);
+            result.push(...subModules);
+        }
+    }
+    return result;
 }
 
 class GeneratorWebpack extends Generator {
 
+    private conf?: Config;
+    private mods?: Extension[];
+    get opts() {
+        return this.options as Options;
+    }
+
     constructor(args: string | string[], opts: {}) {
         super(args, opts);
+
+        this.sourceRoot(path.resolve(__dirname, '..', 'webpack-template'));
 
         this.option('stats', { type: String });
         this.option('cssfilename', { type: String });
@@ -33,30 +58,40 @@ class GeneratorWebpack extends Generator {
     }
 
     async prompting() {
-        // todo prompt user with store:true added if not disableStore
-        const augmentModulesDir = path.join(__dirname, 'augmentModules');
-        const dirs = fs.readdirSync(augmentModulesDir);
         const config = {} as Partial<Config>;
-        for (const mod of getModules()) {
-            if (mod.executeIf(config)) {
-                const prompts = mod.prompts();
-                const answers = await this.prompt(prompts as any);
+        this.mods = getModules(path.join(__dirname, 'augmentModules'));
+        for (const mod of this.mods) {
+            if (!mod.executeIf || mod.executeIf(config)) {
+                const prompts = mod.prompts && mod.prompts() || [];
+                const storePrompts = prompts.map(p => ({ ...p, store: this.opts.disableStore ? false : true }));
+                const answers = await this.prompt(storePrompts as any);
                 Object.assign(config, answers);
             }
         }
+        this.conf = config as Config;
     }
 
     async writing() {
-        const sourceFile = null as any as SourceFile; // todo
 
-        for (const mod of getModules()) {
-            if (mod.executeIf(config)) {
-                mod.augment();
+        const config = this.conf!
+        const parsed = parseFile(this.templatePath(WEBPACK_CONF_JS_NAME));
+
+        for (const mod of this.mods!) {
+            const augmentModule = new mod.AugmentModule(
+                config,
+                this.options,
+                this,
+                parsed
+            );
+            if (!mod.executeIf || mod.executeIf(config)) {
+                augmentModule.augment();
             }
         }
 
+        const { sourceFile } = parsed;
+
         const compiled = compile(sourceFile.getFullText());
-        this.fs.write(this.destinationPath('webpack.config.js'), compiled);
+        this.fs.write(this.destinationPath(WEBPACK_CONF_JS_NAME), compiled);
 
         const installModules = getReferencedModules(sourceFile);
 
@@ -66,12 +101,12 @@ class GeneratorWebpack extends Generator {
     async install() {
         await this.installDependencies({ bower: false })
     }
-    // todo set template root
+    
     private async extendPackageJson(installModules: Set<string>) {
 
         // see https://github.com/SharePoint/sp-dev-docs/issues/2155
 
-        const pkgJsonPath = this.destinationPath('package.json');
+        const pkgJsonPath = this.destinationPath(PACKAGEJSON_FILENAME);
         let indent: string | number = 4;
         if (this.fs.exists(pkgJsonPath)) {
             const json = this.fs.read(pkgJsonPath);
@@ -79,7 +114,7 @@ class GeneratorWebpack extends Generator {
         }
 
         const pkgJson = this.fs.readJSON(pkgJsonPath, {});
-        const templatePkg = require('../webpack-template/package.json');
+        const templatePkg = require(this.templatePath(PACKAGEJSON_FILENAME));
         pkgJson.devDependencies = pkgJson.devDependencies || {};
         const deps = templatePkg.devDependencies;
         for (const installModule of installModules) {

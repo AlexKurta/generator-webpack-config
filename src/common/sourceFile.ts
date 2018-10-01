@@ -5,6 +5,7 @@ import { getNestedPropertyValue } from "../utils";
 import { Context } from "vm";
 
 export interface ParsedSource {
+    mainFunc:FunctionExpression;
     rules: ArrayLiteralExpression;
     plugins: ArrayLiteralExpression;
     resolveExtensions: ArrayLiteralExpression;
@@ -24,6 +25,7 @@ export function parseFile(file: string): ParsedSource {
     const resolveExtensions = getNestedPropertyValue<ArrayLiteralExpression>(config, ['resolve', 'extensions']);
 
     return {
+        mainFunc,
         rules,
         plugins,
         resolveExtensions,

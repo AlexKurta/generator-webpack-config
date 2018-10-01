@@ -12,8 +12,6 @@ import * as phantom from 'phantom';
 import * as os from 'os';
 const which = require('npm-which');
 import { isEqual } from 'lodash';
-import { Config } from '../src/common/config';
-import { Cmds } from '../src/common/cmds';
 process.on('unhandledRejection', (reason, p) => {
     console.log('Unhandled Rejection at:', p, 'reason:', reason);
 });
@@ -37,7 +35,7 @@ function saveJsons() {
 }
 
 interface ConfigAndCmds extends Config {
-    cmds?: Cmds;
+    cmds?: Options;
 }
 
 describe('Generator', function () {
@@ -62,7 +60,7 @@ describe('Generator', function () {
             const answers = Object.assign({}, baseAnswers, customAnswers as Partial<Config>);
             const randomFolderName = uuid();
             const testdir = path.resolve(testdirs, randomFolderName);
-            const opts: Cmds = {
+            const opts: Options = {
                 stats: 'errors-only',
                 disableStore: true, // needed else yeoman could read from .yo-rc-global.json
                 ...customCmds
