@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "test": "npm run tsc && npm run testOnly",
-    "testOnly": "cross-env TS_NODE_PROJECT=test/tsconfig.json mocha -r ts-node/register test/**/test.ts",
+    "testOnly": "cross-env TS_NODE_PROJECT=test/tsconfig.json TS_NODE_FILES=true mocha -r ts-node/register test/**/test.ts",
     "test-npm-local": "gulp test-npm-local",
     "test-npm-local-run": "gulp test-npm-local-run",
     "tsc": "rimraf app && tsc",

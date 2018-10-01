@@ -11,6 +11,7 @@ import { compile } from './compiler';
 import { AugmentModule, Extension } from './common/augmentModule';
 import { parseFile } from './common/sourceFile';
 
+const WEBPACK_CONF_TS_NAME = 'webpack.config.ts';
 const WEBPACK_CONF_JS_NAME = 'webpack.config.js';
 const PACKAGEJSON_FILENAME = 'package.json';
 
@@ -24,10 +25,10 @@ function getModules(dir: string): Extension[] {
     const files = fs.readdirSync(dir).sort();
     const result = [];
     for (const file of files) {
-        const stat = fs.statSync(file);
         const fullPath = path.join(dir, file);
+        const stat = fs.statSync(fullPath);
         if (stat.isFile()) {
-            const mod = require(fullPath) as Extension;
+            const mod = new (require(fullPath) as any).default as Extension;
             result.push(mod);
         } else {
             const subModules = getModules(fullPath);
@@ -58,24 +59,20 @@ class GeneratorWebpack extends Generator {
     }
 
     async prompting() {
-        const config = {} as Partial<Config>;
         this.mods = getModules(path.join(__dirname, 'augmentModules'));
+        const allPrompts = [];
         for (const mod of this.mods) {
-            if (!mod.executeIf || mod.executeIf(config)) {
-                const prompts = mod.prompts && mod.prompts() || [];
-                const storePrompts = prompts.map(p => ({ ...p, store: this.opts.disableStore ? false : true }));
-                const answers = await this.prompt(storePrompts as any);
-                Object.assign(config, answers);
-            }
+            const prompts = mod.prompts && mod.prompts() || [];
+            const storePrompts = prompts.map(p => ({ ...p, store: this.opts.disableStore ? false : true }));
+            allPrompts.push(...storePrompts);
         }
-        this.conf = config as Config;
+        this.conf = await this.prompt(allPrompts as any) as Config;
     }
 
     async writing() {
 
         const config = this.conf!
-        const parsed = parseFile(this.templatePath(WEBPACK_CONF_JS_NAME));
-
+        const parsed = parseFile(this.templatePath(WEBPACK_CONF_TS_NAME));
         for (const mod of this.mods!) {
             const augmentModule = new mod.AugmentModule(
                 config,
@@ -87,6 +84,11 @@ class GeneratorWebpack extends Generator {
                 augmentModule.augment();
             }
         }
+        let counter = 0;
+        for (const st of AugmentModule.statements) {
+            parsed.mainFunc.insertVariableStatement(counter++, st);
+        }
+        AugmentModule.statements.length = 0;
 
         const { sourceFile } = parsed;
 
@@ -94,16 +96,14 @@ class GeneratorWebpack extends Generator {
         this.fs.write(this.destinationPath(WEBPACK_CONF_JS_NAME), compiled);
 
         const installModules = getReferencedModules(sourceFile);
-
-        this.extendPackageJson(installModules);
+        this._extendPackageJson(installModules);
     }
 
     async install() {
         await this.installDependencies({ bower: false })
     }
-    
-    private async extendPackageJson(installModules: Set<string>) {
 
+    private async _extendPackageJson(installModules: Set<string>) {
         // see https://github.com/SharePoint/sp-dev-docs/issues/2155
 
         const pkgJsonPath = this.destinationPath(PACKAGEJSON_FILENAME);

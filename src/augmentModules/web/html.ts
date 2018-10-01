@@ -18,7 +18,9 @@ export default class implements Extension {
 
     prompts() {
         const prompts: Prompt<keyof Config>[] = [
-            {
+            {when: (resp: Config) => {
+                return resp.type === 'web';
+            },
                 type: 'confirm',
                 name: 'html',
                 default: true,
@@ -61,7 +63,10 @@ export default class implements Extension {
     
 
     augment(): void {
-        const { htmlTitle, htmlFilename, htmlTemplate } = this.config;
+        const { html,htmlTitle, htmlFilename, htmlTemplate } = this.config;
+
+        if (!html)
+        return;
 
         this.addImportDeclaration({
             namespaceImport: 'HtmlWebpackPlugin',

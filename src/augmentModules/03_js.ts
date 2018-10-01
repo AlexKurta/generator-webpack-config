@@ -1,5 +1,5 @@
 
-import { AugmentModule, Extension } from "../../common/augmentModule";
+import { AugmentModule, Extension } from "../common/augmentModule";
 
 export default class implements Extension {
     executeIf = (config: Config) => !config.ts;

@@ -25,6 +25,9 @@ export default class implements Extension {
     prompts() {
         const prompts: Prompt<keyof Config>[] = [
             {
+                when: (resp: Config) => {
+                    return resp.type === 'web';
+                },
                 type: 'confirm',
                 name: 'cssModules',
                 default: true,
@@ -62,7 +65,7 @@ export default class implements Extension {
             });
 
             if (useTsModuleLoader && tsdecl) {
-                this.gen.fs.write(this.gen.destinationPath(CSS_DECL_FILENAME), this.gen.fs.read(path.resolve(__dirname, '..', 'webpack-template', CSS_DECL_FILENAME)));
+                this.gen.fs.write(this.gen.destinationPath(CSS_DECL_FILENAME), this.gen.fs.read(this.gen.templatePath(CSS_DECL_FILENAME)));
             }
 
             const cssLoaderModuleOptions = {

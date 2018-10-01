@@ -7,7 +7,7 @@ import { ParsedSource } from "./sourceFile";
 
 export abstract class AugmentModule {
     protected readonly isDev = 'isDev';
-    private varStatementCounter = 0;
+    public static statements:VariableStatementStructure[]=[];
 
     constructor(protected readonly config: Config, protected readonly options: Options, protected readonly gen: Generator, private parsed: ParsedSource) {
     }
@@ -31,7 +31,8 @@ export abstract class AugmentModule {
     }
 
     protected insertVariableStatement(variableStatement: VariableStatementStructure) {
-        this.parsed.mainFunc.insertVariableStatement(this.varStatementCounter++, variableStatement);
+        AugmentModule.statements.push(variableStatement);
+       
     }
 
     protected addImportDeclaration(decl: ImportDeclarationStructure) {
