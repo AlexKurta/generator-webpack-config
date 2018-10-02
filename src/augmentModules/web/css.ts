@@ -1,9 +1,9 @@
-import { ArrayLiteralExpression, SourceFile, FunctionExpression, VariableStatementStructure } from "ts-simple-ast";
+import { ArrayLiteralExpression, SourceFile, FunctionExpression, VariableStatementStructure, VariableDeclarationKind } from "ts-simple-ast";
 import { addToArray, ternary, L, and, write } from "../../utils";
 import * as Generator from 'yeoman-generator';
 import * as path from 'path';
 import { AugmentModule, Extension } from "../../common/augmentModule";
-import { Prompt } from "../../common/prompt";
+import { Prompt, confirmPrompt } from "../../common/prompt";
 
 declare global {
     interface Options {
@@ -20,36 +20,36 @@ const CSS_DECL_FILENAME = 'cssModules.d.ts';
 
 export default class implements Extension {
 
-    executeIf = (config: Config) => config.type === 'web';
-
     prompts() {
         const prompts: Prompt<keyof Config>[] = [
-            {
-                when: (resp: Config) => {
+            confirmPrompt<'cssModules'>({
+                when: (resp) => {
                     return resp.type === 'web';
                 },
-                type: 'confirm',
                 name: 'cssModules',
                 default: true,
                 message: 'Use CSS modules?'
-            },
-            {
-                when: (resp: Config) => {
+            }),
+            confirmPrompt<'tsdecl'>({
+                when: (resp) => {
                     return resp.ts && resp.cssModules;
                 },
-                type: 'confirm',
                 name: 'tsdecl',
                 default: true,
                 message: `Create TypeScript declaration file for *.css, *.scss and *.sass imports? This is required for working css modules. You will have to make sure your tsconfig.json includes this file in its configuration. It will be named \'${CSS_DECL_FILENAME}\'.`
-            },
+            }),
         ];
+
         return prompts;
     }
 
     AugmentModule = class extends AugmentModule {
 
         augment() {
-            const { cssModules, ts: ts2, tsdecl } = this.config;
+            const { type, cssModules, ts: ts2, tsdecl } = this.config;
+
+            if (type !== 'web') return;
+
             const { extractcss, cssfilename } = this.options;
 
             const ts = !!cssModules && !!ts2;
@@ -58,6 +58,7 @@ export default class implements Extension {
 
             const useTsModuleLoader = ts && cssModules;
             this.insertVariableStatement({
+                declarationKind: VariableDeclarationKind.Const,
                 declarations: [{
                     name: useCssExtractPlugin,
                     initializer: typeof extractcss === 'boolean' ? extractcss.toString() : `!${this.isDev}`

@@ -1,6 +1,6 @@
 import { ternary, L, write } from "../../utils";
 import { AugmentModule, Extension } from "../../common/augmentModule";
-import { Prompt } from "../../common/prompt";
+import { Prompt, confirmPrompt, inputPrompt } from "../../common/prompt";
 
 declare global {
     interface Config {
@@ -12,80 +12,74 @@ declare global {
 }
 
 export default class implements Extension {
-    executeIf(resp: Config) {
-        return resp.type === 'web';
-    }
-
     prompts() {
         const prompts: Prompt<keyof Config>[] = [
-            {when: (resp: Config) => {
-                return resp.type === 'web';
-            },
-                type: 'confirm',
+            confirmPrompt<'html'>({
+                when: (resp) => {
+                    return resp.type === 'web';
+                },
                 name: 'html',
                 default: true,
                 message: 'Create html file? Scripts and style sheets will automatically be inserted into this file.'
-            },
-            {
-                when: (resp: Config) => {
+            }),
+            inputPrompt<'htmlTitle'>({
+                when: (resp) => {
                     return resp.html;
                 },
-                type: 'input',
                 name: 'htmlTitle',
                 default: 'Webpack App',
                 message: '(html) Title'
-            },
-            {
-                when: (resp: Config) => {
+            }),
+            inputPrompt<'htmlFilename'>({
+                when: (resp) => {
                     return resp.html;
                 },
-                type: 'input',
                 name: 'htmlFilename',
                 default: 'index.html',
                 message: '(html) Output file'
-            },
-            {
-                when: (resp: Config) => {
+            }),
+            inputPrompt<'htmlTemplate'>({
+                when: (resp) => {
                     return resp.html;
                 },
-                filter: (input: string) => {
+                filter: (input) => {
                     return input.trim() || undefined;
                 },
-                type: 'input',
                 name: 'htmlTemplate',
                 message: '(html) Template file (will create a standard html file if not specified)'
-            }
+            })
         ]
+
         return prompts;
     }
+
     AugmentModule = class extends AugmentModule {
 
-    
+        augment(): void {
+            const { type, html, htmlTitle, htmlFilename, htmlTemplate } = this.config;
 
-    augment(): void {
-        const { html,htmlTitle, htmlFilename, htmlTemplate } = this.config;
+            if (type !== 'web') return;
 
-        if (!html)
-        return;
+            if (!html) return;
 
-        this.addImportDeclaration({
-            namespaceImport: 'HtmlWebpackPlugin',
-            moduleSpecifier: 'html-webpack-plugin'
-        })
+            this.addImportDeclaration({
+                namespaceImport: 'HtmlWebpackPlugin',
+                moduleSpecifier: 'html-webpack-plugin'
+            })
 
-        this.addPlugins(
-            write(L('new HtmlWebpackPlugin('), {
-                title: htmlTitle,
-                filename: htmlFilename,
-                ...(htmlTemplate && { template: htmlTemplate }),
-                minify: ternary(this.isDev, false, {
-                    collapseWhitespace: true,
-                    collapseInlineTagWhitespace: true,
-                    removeComments: true,
-                    removeRedundantAttributes: true
-                })
-            }, L(')'))
-        )
+            this.addPlugins(
+                write(L('new HtmlWebpackPlugin('), {
+                    title: htmlTitle,
+                    filename: htmlFilename,
+                    ...(htmlTemplate && { template: htmlTemplate }),
+                    minify: ternary(this.isDev, false, {
+                        collapseWhitespace: true,
+                        collapseInlineTagWhitespace: true,
+                        removeComments: true,
+                        removeRedundantAttributes: true
+                    })
+                }, L(')'))
+            )
+        }
     }
-}
 }

@@ -72,12 +72,16 @@ export function objectToText(obj: any, writer: CodeBlockWriter) {
 }
 
 export function insertToArray(index: number, array: ArrayLiteralExpression, ...elements: any[]) {
-    array.insertElements(index, writer => elements.forEach((e, i) => {
-        objectToText(e, writer);
-        if (i < elements.length - 1)
-            writer.write(',' + os.EOL)
-    }))
+    array.insertElements(index, writer => {
+        writer.write(os.EOL);
+        elements.forEach((e, i) => {
+            objectToText(e, writer);
+            if (i < elements.length - 1)
+                writer.write(',' + os.EOL)
+        })
+    })
 }
+
 export function addToArray(array: ArrayLiteralExpression, ...elements: any[]) {
     insertToArray(array.compilerNode.elements.length, array, ...elements);
 }
@@ -89,6 +93,7 @@ export function write(...str: any[]): Literal {
     }
     return L(writer.toString());
 }
+
 export function insertToObject(index: number, obj: ObjectLiteralExpression, addObj: { [key: string]: any }) {
     obj.insertPropertyAssignments(index, Object.keys(addObj).map((key, i) => {
         return {
@@ -97,6 +102,7 @@ export function insertToObject(index: number, obj: ObjectLiteralExpression, addO
         } as PropertyAssignmentStructure;
     }))
 }
+
 export function addToObject(obj: ObjectLiteralExpression, addObj: { [key: string]: any }) {
     insertToObject(obj.compilerNode.properties.length, obj, addObj)
 }
@@ -107,6 +113,7 @@ export function L(str: string): Literal {
         text: str
     }
 }
+
 export function and(varName: string, expr: any): Literal {
     const writer = new CodeBlockWriter();
     objectToText(expr, writer);

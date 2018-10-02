@@ -1,12 +1,11 @@
 import * as path from 'path';
 
-const webpackConfigurationFn = async (
+/*return*/
+export default (
     env,
     argv
 ) => {
-
-    const plugins = [];
-
+/*return*/
     const config = {
         module: {
             rules: []
@@ -15,10 +14,8 @@ const webpackConfigurationFn = async (
             extensions: [".js", ".jsx", ".css", ".json"]
         },
         context: __dirname,
-        plugins: plugins.filter(Boolean)
+        plugins: [].filter(Boolean)
     };
-
+/*return*/
     return config;
 };
-
-export default webpackConfigurationFn;

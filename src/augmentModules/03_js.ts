@@ -2,10 +2,13 @@
 import { AugmentModule, Extension } from "../common/augmentModule";
 
 export default class implements Extension {
-    executeIf = (config: Config) => !config.ts;
     AugmentModule = class extends AugmentModule {
 
         augment(): void {
+
+            const { ts } = this.config;
+
+            if (ts) return;
 
             this.addRules(
                 {

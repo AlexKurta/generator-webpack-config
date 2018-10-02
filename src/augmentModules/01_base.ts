@@ -1,9 +1,8 @@
-
-
 import { ternary, L, write } from "../utils";
 import { AugmentModule, Extension } from "../common/augmentModule";
-import { Prompt } from "../common/prompt";
+import { Prompt, inputPrompt, listPrompt, confirmPrompt } from "../common/prompt";
 import * as path from 'path';
+import { VariableDeclarationKind } from "ts-simple-ast";
 
 declare global {
     interface Config {
@@ -21,10 +20,10 @@ declare global {
 }
 
 export default class implements Extension {
-    prompts() {// do not use subobject property notation (e.g. css.modules), because store:true does not work correctly with that
+    prompts() {
+        // do not use subobject property notation (e.g. css.modules), because store:true does not work correctly with that
         const prompts: Prompt<keyof Config>[] = [
-            {
-                type: 'list',
+            listPrompt<'type'>({
                 message: 'For what kind of project do you wish to create a webpack configuration?',
                 name: 'type',
                 choices: [
@@ -37,60 +36,54 @@ export default class implements Extension {
                         value: 'node'
                     }
                 ]
-            },
-            {
-                type: 'input',
+            }),
+            inputPrompt<'entry'>({
                 name: 'entry',
                 default: './src/index.js',
                 message: 'Path to entry file'
-            },
-            {
-                type: 'confirm',
+            }),
+            confirmPrompt<'seperate_outdirs'>({
                 name: 'seperate_outdirs',
                 default: true,
                 message: 'Separate output directories for production and development mode?'
-            },
-            {
-                when: (resp: Config) => {
+            }),
+            inputPrompt<'outProd'>({
+                when: (resp) => {
                     return resp.seperate_outdirs;
                 },
-                type: 'input',
                 name: 'outProd',
                 default: path.join('build', 'release'),
                 message: '(output) Production directory'
-            },
-            {
-                when: (resp: Config) => {
+            }),
+            inputPrompt<'outDev'>({
+                when: (resp) => {
                     return resp.seperate_outdirs;
                 },
-                type: 'input',
                 name: 'outDev',
                 default: path.join('build', 'debug'),
                 message: '(output) Development directory'
-            },
-            {
-                when: (resp: Config) => {
+            }),
+            inputPrompt<'outSingle'>({
+                when: (resp) => {
                     return !resp.seperate_outdirs;
                 },
-                type: 'input',
                 name: 'outSingle',
                 default: 'build',
                 message: '(output) Directory'
-            },
-            {
-                type: 'input',
+            }),
+            inputPrompt<'outFileName'>({
                 name: 'outFileName',
                 default: '[chunkhash].bundle.js',
                 message: '(output) File name'
-            },
+            }),
         ]
+
         return prompts;
     }
+
     AugmentModule = class extends AugmentModule {
 
         private outDir = 'outDir';
-
-     
 
         augment(): void {
             this.addVariables();
@@ -102,6 +95,7 @@ export default class implements Extension {
             const { outSingle, outDev, outProd } = this.config;
 
             this.insertVariableStatement({
+                declarationKind: VariableDeclarationKind.Const,
                 declarations: [
                     {
                         name: this.isDev,
@@ -142,6 +136,4 @@ export default class implements Extension {
             )
         }
     }
-
-
 }

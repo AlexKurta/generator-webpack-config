@@ -1,5 +1,5 @@
 import { AugmentModule, Extension } from "../common/augmentModule";
-import { Prompt } from "../common/prompt";
+import { Prompt, confirmPrompt, inputPrompt } from "../common/prompt";
 
 declare global {
     interface Config {
@@ -9,31 +9,30 @@ declare global {
 }
 
 export default class implements Extension {
+
     prompts() {
         const prompts: Prompt<keyof Config>[] = [
-            {
-                type: 'confirm',
+            confirmPrompt<'ts'>({
                 name: 'ts',
                 default: false,
                 message: 'Enable typescript transpilation?'
-            },
-            {
-                when: (resp: Config) => {
+            }),
+            inputPrompt<'tsConfig'>({
+                when: (resp) => {
                     return resp.ts;
                 },
-                filter: (input: string) => {
+                filter: (input) => {
                     return input.trim() || undefined;
                 },
-                type: 'input',
                 name: 'tsConfig',
                 message: '(typescript) Location of tsconfig.json (leave empty for default)'
-            },
+            }),
         ]
+
         return prompts;
     }
-    AugmentModule = class extends AugmentModule {
 
-     
+    AugmentModule = class extends AugmentModule {
 
         augment(): void {
             const { ts, tsConfig } = this.config;

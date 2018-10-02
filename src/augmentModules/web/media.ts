@@ -8,12 +8,14 @@ declare global {
 }
 
 export default class implements Extension {
-    executeIf(resp: Config) {
-        return resp.type === 'web';
-    }
+
     AugmentModule = class extends AugmentModule {
 
         augment(): void {
+            const { type } = this.config;
+
+            if (type !== 'web') return;
+
             const { urlloaderbytes } = this.options;
 
             const urlLoaderWithSizeLimit = {

@@ -45,7 +45,6 @@ export interface AugmentModuleConstructor {
 }
 
 export interface Extension {
-    executeIf?(config: Partial<Config>): boolean;
     prompts?(): Prompt<keyof Config>[];
     AugmentModule: AugmentModuleConstructor;
 }

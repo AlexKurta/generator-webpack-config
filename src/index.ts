@@ -80,9 +80,7 @@ class GeneratorWebpack extends Generator {
                 this,
                 parsed
             );
-            if (!mod.executeIf || mod.executeIf(config)) {
-                augmentModule.augment();
-            }
+            augmentModule.augment();
         }
         let counter = 0;
         for (const st of AugmentModule.statements) {
@@ -92,7 +90,7 @@ class GeneratorWebpack extends Generator {
 
         const { sourceFile } = parsed;
 
-        const compiled = compile(sourceFile.getFullText());
+        const compiled = compile(sourceFile.getFullText()).replace(/\/\*return\*\//g, '').replace(/Object\.defineProperty.*/, '');
         this.fs.write(this.destinationPath(WEBPACK_CONF_JS_NAME), compiled);
 
         const installModules = getReferencedModules(sourceFile);

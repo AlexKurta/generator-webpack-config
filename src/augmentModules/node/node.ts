@@ -4,10 +4,13 @@ import { L } from "../../utils";
 import { AugmentModule, Extension } from "../../common/augmentModule";
 
 export default class implements Extension {
-    executeIf = (config: Config) => config.type === 'node';
     AugmentModule = class extends AugmentModule {
 
         augment(): void {
+
+            const { type } = this.config;
+
+            if (type !== 'node') return;
 
             this.addToConfigObject({
                 target: 'node',

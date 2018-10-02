@@ -1,11 +1,10 @@
 import { Prompt } from "./prompt";
 import * as Generator from 'yeoman-generator';
-import Project, { ImportDeclarationStructure, VariableStatementStructure, FunctionExpression, ObjectLiteralExpression, ArrayLiteralExpression, SourceFile } from "ts-simple-ast";
+import Project, { ImportDeclarationStructure, VariableStatementStructure, FunctionExpression, ObjectLiteralExpression, ArrayLiteralExpression, SourceFile, PropertyAccessExpression, ArrowFunction } from "ts-simple-ast";
 import { getNestedPropertyValue } from "../utils";
-import { Context } from "vm";
 
 export interface ParsedSource {
-    mainFunc:FunctionExpression;
+    mainFunc: FunctionExpression;
     rules: ArrayLiteralExpression;
     plugins: ArrayLiteralExpression;
     resolveExtensions: ArrayLiteralExpression;
@@ -18,10 +17,13 @@ export function parseFile(file: string): ParsedSource {
     const project = new Project();
     const sourceFile = project.addExistingSourceFile(file);
 
-    const mainFunc = sourceFile.getVariableDeclarationOrThrow('webpackConfigurationFn').getInitializer() as FunctionExpression;
+    const exportDecl = sourceFile.getExportAssignments()[0];
+    const mainFunc = exportDecl.getExpression() as FunctionExpression;
+
     const config = mainFunc.getVariableDeclarationOrThrow('config').getInitializer() as ObjectLiteralExpression;
-    const rules = getNestedPropertyValue<ArrayLiteralExpression>(config, ['module', 'rules'])
-    const plugins = mainFunc.getVariableDeclarationOrThrow('plugins').getInitializer() as ArrayLiteralExpression;
+    const rules = getNestedPropertyValue<ArrayLiteralExpression>(config, ['module', 'rules']);
+
+    const plugins = getNestedPropertyValue<PropertyAccessExpression>(config, ['plugins']).getExpression().getChildren()[0] as ArrayLiteralExpression;
     const resolveExtensions = getNestedPropertyValue<ArrayLiteralExpression>(config, ['resolve', 'extensions']);
 
     return {
