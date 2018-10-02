@@ -13,7 +13,8 @@ Manually creating webpack configuration files ...
 
 ## Caveats
 
-* limited configuration ability compared to webpack (may also want to use [webpack-merge](https://www.npmjs.com/package/webpack-merge) to merge with additional webpack configuration)
+* limited configuration ability compared to webpack
+* if you want to preserve the generated file to be able to update (overwrite) it with later versions of the generator, you may want to use [webpack-merge](https://www.npmjs.com/package/webpack-merge) to merge with another webpack configuration file
 
 ## Getting Started
 
@@ -88,13 +89,11 @@ Concrete TODOs can be found as comments in the code, this is just a general indi
     * ability to extend the generator
     * populate resolve.alias object in webpack.config when using typescript (replicate paths from tsconfig.json)
     * also try to remove no longer needed dependencies from package.json when generator configuration changes
-    * prettier code generation result
 * tests
     * don't run tests strictly once for production and once for development mode, but rather share more test code in this case to speed up test runs
     * some tests are still missing or incomplete
     * let webpack write from and to a memory fs
     * generally the test run is still extremely slow due to the nature of testing webpack even though parallelization, which has been added, has already shown extreme performance benefits
-* code cleanup, e.g. organizing the generator code according to what code does what to the generated webpack config (split code into multiple files, separation of concerns)
 
 ## License
 
