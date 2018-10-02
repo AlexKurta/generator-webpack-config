@@ -1,13 +1,13 @@
 import { Prompt } from "./prompt";
 import * as Generator from 'yeoman-generator';
-import Project, { ImportDeclarationStructure, VariableStatementStructure, FunctionExpression, ObjectLiteralExpression, ArrayLiteralExpression } from "ts-simple-ast";
+import Project, { ImportDeclarationStructure, VariableStatementStructure, FunctionExpression, ObjectLiteralExpression, ArrayLiteralExpression, VariableDeclarationKind, VariableDeclarationStructure } from "ts-simple-ast";
 import { getNestedPropertyValue, addToArray, addToObject } from "../utils";
 import { Context } from "vm";
 import { ParsedSource } from "./sourceFile";
 
 export abstract class AugmentModule {
     protected readonly isDev = 'isDev';
-    public static statements:VariableStatementStructure[]=[];
+    private static statements: VariableDeclarationStructure[] = [];
 
     constructor(protected readonly config: Config, protected readonly options: Options, protected readonly gen: Generator, private parsed: ParsedSource) {
     }
@@ -30,13 +30,25 @@ export abstract class AugmentModule {
         addToArray(this.parsed.resolveExtensions, ...elements);
     }
 
-    protected insertVariableStatement(variableStatement: VariableStatementStructure) {
-        AugmentModule.statements.push(variableStatement);
-       
+    protected insertVariableStatement(statements: VariableDeclarationStructure[]) {
+        AugmentModule.statements.push(...statements);
     }
 
     protected addImportDeclaration(decl: ImportDeclarationStructure) {
         this.parsed.sourceFile.addImportDeclaration(decl);
+    }
+
+    static onGeneratorEnd(parsed: ParsedSource) {
+        parsed.mainFunc.insertVariableStatement(
+            0,
+            {
+                declarationKind: VariableDeclarationKind.Const,
+                declarations: AugmentModule.statements
+            }
+        );
+
+        // needed because yeoman-test reuses this program instance in tests
+        AugmentModule.statements.length = 0;
     }
 }
 

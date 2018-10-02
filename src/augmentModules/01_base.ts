@@ -94,19 +94,15 @@ export default class implements Extension {
         private addVariables() {
             const { outSingle, outDev, outProd } = this.config;
 
-            this.insertVariableStatement({
-                declarationKind: VariableDeclarationKind.Const,
-                declarations: [
-                    {
-                        name: this.isDev,
-                        initializer: "argv.mode === 'development'"
-                    },
-                    {
-                        name: this.outDir,
-                        initializer: outSingle ? `'${outSingle}'` : ternary(this.isDev, outDev, outProd).text
-                    }]
-            })
-
+            this.insertVariableStatement([
+                {
+                    name: this.isDev,
+                    initializer: "argv.mode === 'development'"
+                },
+                {
+                    name: this.outDir,
+                    initializer: outSingle ? `'${outSingle}'` : ternary(this.isDev, outDev, outProd).text
+                }])
         }
 
         private augmentConfigObject() {

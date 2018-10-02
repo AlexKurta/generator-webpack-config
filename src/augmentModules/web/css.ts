@@ -57,13 +57,10 @@ export default class implements Extension {
             const useCssExtractPlugin = 'useCssExtractPlugin';
 
             const useTsModuleLoader = ts && cssModules;
-            this.insertVariableStatement({
-                declarationKind: VariableDeclarationKind.Const,
-                declarations: [{
-                    name: useCssExtractPlugin,
-                    initializer: typeof extractcss === 'boolean' ? extractcss.toString() : `!${this.isDev}`
-                }]
-            });
+            this.insertVariableStatement([{
+                name: useCssExtractPlugin,
+                initializer: typeof extractcss === 'boolean' ? extractcss.toString() : `!${this.isDev}`
+            }]);
 
             if (useTsModuleLoader && tsdecl) {
                 this.gen.fs.write(this.gen.destinationPath(CSS_DECL_FILENAME), this.gen.fs.read(this.gen.templatePath(CSS_DECL_FILENAME)));

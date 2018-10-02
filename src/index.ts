@@ -82,15 +82,14 @@ class GeneratorWebpack extends Generator {
             );
             augmentModule.augment();
         }
-        let counter = 0;
-        for (const st of AugmentModule.statements) {
-            parsed.mainFunc.insertVariableStatement(counter++, st);
-        }
-        AugmentModule.statements.length = 0;
+
+        AugmentModule.onGeneratorEnd(parsed);
 
         const { sourceFile } = parsed;
 
-        const compiled = compile(sourceFile.getFullText()).replace(/\/\*return\*\//g, '').replace(/Object\.defineProperty.*/, '');
+        const compiled = compile(sourceFile.getFullText())
+            .replace(/\/\*return\*\//g, '')
+            .replace(/Object\.defineProperty.*/, '');
         this.fs.write(this.destinationPath(WEBPACK_CONF_JS_NAME), compiled);
 
         const installModules = getReferencedModules(sourceFile);
