@@ -71,19 +71,25 @@ export function objectToText(obj: any, writer: CodeBlockWriter) {
     }
 }
 
-export function insertToArray(index: number, array: ArrayLiteralExpression, ...elements: any[]) {
+interface InsertArrayOptions {
+    noReturns?: boolean;
+}
+
+export function insertToArray(index: number, array: ArrayLiteralExpression, elements: any[], options: InsertArrayOptions = {}) {
     array.insertElements(index, writer => {
-        writer.write(os.EOL);
+        !options.noReturns && writer.write(os.EOL);
         elements.forEach((e, i) => {
             objectToText(e, writer);
-            if (i < elements.length - 1)
-                writer.write(',' + os.EOL)
+            if (i < elements.length - 1) {
+                writer.write(',');
+                !options.noReturns && writer.write(os.EOL);
+            }
         })
     })
 }
 
-export function addToArray(array: ArrayLiteralExpression, ...elements: any[]) {
-    insertToArray(array.compilerNode.elements.length, array, ...elements);
+export function addToArray(array: ArrayLiteralExpression, elements: any[], options: InsertArrayOptions = {}) {
+    insertToArray(array.compilerNode.elements.length, array, elements, options);
 }
 
 export function write(...str: any[]): Literal {

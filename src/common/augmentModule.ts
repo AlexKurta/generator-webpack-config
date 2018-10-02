@@ -19,15 +19,15 @@ export abstract class AugmentModule {
     }
 
     protected addRules(...elements: any[]) {
-        addToArray(this.parsed.rules, ...elements);
+        addToArray(this.parsed.rules, elements);
     }
 
     protected addPlugins(...elements: any[]) {
-        addToArray(this.parsed.plugins, ...elements);
+        addToArray(this.parsed.plugins, elements);
     }
 
     protected addResolveExtensions(...elements: any[]) {
-        addToArray(this.parsed.resolveExtensions, ...elements);
+        addToArray(this.parsed.resolveExtensions, elements, { noReturns: true });
     }
 
     protected insertVariableStatement(statements: VariableDeclarationStructure[]) {

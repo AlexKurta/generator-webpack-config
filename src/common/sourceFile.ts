@@ -25,7 +25,7 @@ export function parseFile(file: string): ParsedSource {
 
     const plugins = getNestedPropertyValue<PropertyAccessExpression>(config, ['plugins']).getExpression().getChildren()[0] as ArrayLiteralExpression;
     const resolveExtensions = getNestedPropertyValue<ArrayLiteralExpression>(config, ['resolve', 'extensions']);
-// todo adding to resolve extension array should add not returns
+
     return {
         mainFunc,
         rules,
