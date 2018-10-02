@@ -10,12 +10,15 @@ export function getNestedPropertyValue<T extends Expression>(obj: ObjectLiteralE
     return curObj as T;
 }
 
+const isLiteralSymbol = Symbol();
+
 export interface Literal {
-    readonly isLiteral: true // todo use symbol instead
+    readonly [isLiteralSymbol]: true
     readonly text: string;
 }
+
 export function isLiteralExpr(literal: any): literal is Literal {
-    return literal && (literal as Literal).isLiteral;
+    return literal && literal[isLiteralSymbol];
 }
 
 export function objectToText(obj: any, writer: CodeBlockWriter) {
@@ -115,7 +118,7 @@ export function addToObject(obj: ObjectLiteralExpression, addObj: { [key: string
 
 export function L(str: string): Literal {
     return {
-        isLiteral: true,
+        [isLiteralSymbol]: true,
         text: str
     }
 }
